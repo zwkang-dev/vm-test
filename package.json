@@ -9,7 +9,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/lodash-es": "^4.17.12",
     "@vueuse/core": "^10.11.0",
+    "@zwkang/vue-use-modal": "0.0.1-beta.6",
+    "lodash-es": "^4.17.21",
     "tdesign-vue-next": "^1.9.6",
     "vue": "^3.4.21"
   },

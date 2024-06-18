@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { watch, computed, defineEmits, defineProps, toRef, toRefs, ref } from "vue";
-import { injectPollingFlowStatus } from "../../hooks/use-polling-flow-status";
 import { useNodeForm } from "./hook";
 
 interface IProps {
@@ -11,8 +10,8 @@ const props = defineProps<IProps>();
 const { formData } = toRefs(props);
 const emits = defineEmits(['submit', 'cancel'])
 
-const { toggle, isActive } = injectPollingFlowStatus()!;
-const text = computed(() => (isActive.value ? "停止轮询" : "开始轮询"));
+// const { toggle, isActive } = injectPollingFlowStatus()!;
+// const text = computed(() => (isActive.value ? "停止轮询" : "开始轮询"));
 
 const formRef = ref();
 const { getFormData, formData: FormData, setFormData, handleDayChange } = useNodeForm();
@@ -26,14 +25,20 @@ const options = [
   { label: '周', value: 1 },
   { label: '月', value: 2 },
 ];
+
+defineExpose({
+  getValues: () => {
+    return {
+      edges: [],
+      flowExt: {},
+      nodes: [getFormData()],
+    }
+  }
+})
 </script>
 
 <template>
   <div class="w-[300px] flex flex-col mt-2">
-    <t-button @click="toggle">
-      {{ text }}
-    </t-button>
-
     <t-form class="mt-2" ref="formRef">
       <t-form-item label="用户名">
         <t-input v-model="FormData.user" placeholder="请填写用户名"></t-input>

@@ -1,23 +1,38 @@
 <script setup lang="ts">
 import HelloWorld from './components/HelloWorld.vue'
 import { provideDetailPage } from './hooks/use-detail-page';
-import { providePollingFlowStatus } from './hooks/use-polling-flow-status';
-import NodeForm from './components/NodeForm'
+import { injectPollingFlowStatus, providePollingFlowStatus } from './hooks/use-polling-flow-status';
 import { provideFlowStatus } from './hooks/use-flow-status';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import DialogForm from './components/DialogForm/DialogForm.vue';
+import { provideActions } from './hooks/use-actions-provider';
+import { useSave } from './hooks/use-save';
+import Toolbar from './components/toolbar.vue';
+import { usePublish } from './hooks/use-publish';
+import NodeForm from './components/NodeForm/NodeForm.vue';
 
-provideDetailPage();
+const { state, loadDetailPage } = provideDetailPage();
 
 const { isActive } = providePollingFlowStatus()!
 const { statusText } = provideFlowStatus();
 
+const { register } = provideActions();
+
+register('save-command', useSave);
+register('publish-command', usePublish)
+
+const { toggle } = injectPollingFlowStatus()!;
+toggle();
 
 const showDialog = ref(false);
+
+const formData = computed(() => state.value.nodes[0])
+loadDetailPage();
 </script>
 
 <template>
   <div class="h-screen w-screen ">
+    <Toolbar />
     <p>
       上线状态 {{ statusText }}
     </p>
@@ -30,6 +45,9 @@ const showDialog = ref(false);
     </t-button>
 
     <DialogForm v-if="showDialog" :formData="{}" :show="showDialog" @cancel="showDialog = false" @submit="showDialog = false" />
+
+
+    <NodeForm :formData="formData" />
   </div>
 
 </template>

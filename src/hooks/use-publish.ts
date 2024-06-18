@@ -1,9 +1,11 @@
 import { mockDelay } from './utils';
 import { useAsyncState } from '@vueuse/core'
-import { Message, MessagePlugin} from 'tdesign-vue-next';
+import { MessagePlugin} from 'tdesign-vue-next';
 import { injectDetailPage } from './use-detail-page';
 import { computed } from 'vue';
 import { DialogPlugin } from 'tdesign-vue-next';
+import { injectActions } from './use-actions-provider';
+import { useSplitDetailPage } from './use-split-detail-page';
 
 // const auditAction = DialogPlugin({
 //   header: '测试一下modal',
@@ -26,15 +28,16 @@ function useModal(type: 'fail' | 'success' = 'fail') {
 
 
 // 保存操作
-export function useSave() {
-  const { state } = injectDetailPage()!;
-  const disabled = computed(() => state.value.flowStatus === 1);
+export function usePublish() {
+  const { state, updateDirty } = injectDetailPage()!;
+
+  const { useValue } = injectActions()!;
+  const saveCommand = useValue('save-command')
+  const { dirty } = useSplitDetailPage();
 
   const { execute, isLoading } = useAsyncState(async () => {
-
     await mockDelay(3000);
 
-    state.value.flowStatus = 1;
   }, null, {
     immediate: false,
     onError: (e) => {
@@ -44,10 +47,21 @@ export function useSave() {
     }
   })
 
-  async function handleSave() {
-    if(disabled.value) {
-      MessagePlugin.warning('禁用中 不允许保存')
-      throw new Error('禁用中 不允许保存')
+  async function handlePublish() {
+    if(saveCommand.value.loading) {
+      return MessagePlugin.warning('正在保存，请稍后重试')
+    }
+
+    // 发布前先执行一下保存
+    if(dirty.value) {
+      await saveCommand.value.action()
+
+      updateDirty(false);
+
+
+      setTimeout(() => {
+        updateDirty(true);
+      }, 10000)
     }
     await execute(100)
 
@@ -58,22 +72,21 @@ export function useSave() {
       flowStatus: state.value.flowStatus,
       ext: state.value.ext,
     }
-
+    MessagePlugin.success('发布成功')
     console.log('params: ', params);
-    MessagePlugin.success('保存成功')
+
   }
 
   return {
-    action: handleSave,
+    action: handlePublish,
     loading: isLoading,
-    disabled,
     label: {
-      form: '在表单里保存',
-      toolbar: '保存',
+      form: '在表单里发布',
+      toolbar: '发布',
     },
     icon: {
-      form: 'sneer',
-      toolbar: 'palette',
+      form: 'palette',
+      toolbar: 'sneer',
     }
   }
 }

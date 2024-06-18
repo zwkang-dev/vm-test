@@ -11,5 +11,6 @@ export function useSplitDetailPage() {
 
     currentId: computed(() => state.value.id),
     currentVersion: computed(() => state.value.ext.version || '1.0.0'),
+    dirty: computed(() => state.value.dirty)
   }
 }

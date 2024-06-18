@@ -19,6 +19,8 @@ function useDetailPage() {
       inChargeUsers: '' as string,
       version: '',
     },
+
+    dirty: true,
   })
 
   const { execute, isLoading } = useAsyncState(async () => {
@@ -29,6 +31,7 @@ function useDetailPage() {
       id: '11',
       name: '开始',
       type: 'start',
+      user: 'zwkang',
       x: 100,
       y: 100,
     }, {
@@ -55,10 +58,16 @@ function useDetailPage() {
     }
   })
 
+  function updateDirty(bool: boolean) {
+    state.value.dirty = bool;
+  }
+  
+
   return {
     loadDetailPage: execute,
     isLoading,
     state,
+    updateDirty
   }
 }
 

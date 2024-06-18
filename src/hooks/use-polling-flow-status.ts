@@ -7,7 +7,7 @@ function usePollingFlowStatus() {
 
   async function pollingUpdateDetailPageStatus() {
     await mockDelay(2000)
-    state.value.flowStatus = Math.floor(Math.random() * 3)
+    state.value.flowStatus = Math.floor(Math.random() * 4)
   }
 
   const {
