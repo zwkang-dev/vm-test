@@ -1,11 +1,13 @@
 import { createInjectionState } from "@vueuse/core";
-import { computed, ref } from "vue";
+import { computed, ref, type Ref } from "vue";
 import { get } from 'lodash-es'
 
 type ActionType = {
   label: Record<string, string>;
   icon: string | Record<string, string>;
   action: () => Promise<any> | any;
+  loading: Ref<boolean> | boolean;
+  disabled: Ref<boolean> | boolean;
 }
 
 
